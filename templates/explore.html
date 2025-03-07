@@ -1,0 +1,139 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="mb-3">Browse Listings</h2>
+
+    <!-- Search Bar -->
+    <div class="search-container mb-4">
+        <form action="{{ url_for('explore') }}" method="get">
+            <div class="input-group">
+                <input type="search" class="form-control" name="q" placeholder="Search listings..." value="{{ search_query if search_query }}">
+            </div>
+        </form>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <p class="mb-0 text-muted">Filters:</p>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-dark" id="gridViewBtn" title="Grid View">
+                    <i class="bi bi-grid"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-dark" id="listViewBtn" title="List View">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        </div>
+        <div class="filters-row">
+            <form action="{{ url_for('explore') }}" method="get" class="row g-2">
+                <!-- Categories -->
+                <div class="col-md-3">
+                    <select class="form-select" name="category">
+                        <option value="">All Categories</option>
+                        <optgroup label="Electronics">
+                            <option value="Laptops" {% if category == 'Laptops' %}selected{% endif %}>Laptops & Computers</option>
+                            <option value="Tablets" {% if category == 'Tablets' %}selected{% endif %}>Tablets & E-readers</option>
+                            <option value="Calculators" {% if category == 'Calculators' %}selected{% endif %}>Calculators</option>
+                        </optgroup>
+                        <optgroup label="Study Materials">
+                            <option value="Textbooks" {% if category == 'Textbooks' %}selected{% endif %}>Textbooks</option>
+                            <option value="Notes" {% if category == 'Notes' %}selected{% endif %}>Study Notes</option>
+                            <option value="Study Guides" {% if category == 'Study Guides' %}selected{% endif %}>Study Guides</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Condition -->
+                <div class="col-md-3">
+                    <select class="form-select" name="condition">
+                        <option value="">Any Condition</option>
+                        <option value="New" {% if condition == 'New' %}selected{% endif %}>New</option>
+                        <option value="Like New" {% if condition == 'Like New' %}selected{% endif %}>Like New</option>
+                        <option value="Very Good" {% if condition == 'Very Good' %}selected{% endif %}>Very Good</option>
+                        <option value="Good" {% if condition == 'Good' %}selected{% endif %}>Good</option>
+                        <option value="Fair" {% if condition == 'Fair' %}selected{% endif %}>Fair</option>
+                    </select>
+                </div>
+
+                <!-- Price Range -->
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="min_price" placeholder="Min $" value="{{ min_price if min_price }}">
+                        <input type="number" class="form-control" name="max_price" placeholder="Max $" value="{{ max_price if max_price }}">
+                    </div>
+                </div>
+
+                <!-- Sort By -->
+                <div class="col-md-2">
+                    <select class="form-select" name="sort">
+                        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </div>
+
+                <!-- Apply Filters Button -->
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Category Filters -->
+    <div class="category-buttons mb-4">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('explore', category='Laptops') }}" class="btn btn-outline-secondary">Laptops & Computers</a>
+            <a href="{{ url_for('explore', category='Tablets') }}" class="btn btn-outline-secondary">Tablets & E-readers</a>
+            <a href="{{ url_for('explore', category='Calculators') }}" class="btn btn-outline-secondary">Calculators</a>
+            <a href="{{ url_for('explore', category='Textbooks') }}" class="btn btn-outline-secondary">Textbooks</a>
+            <a href="{{ url_for('explore', category='Notes') }}" class="btn btn-outline-secondary">Study Notes</a>
+            <a href="{{ url_for('explore', category='Study Guides') }}" class="btn btn-outline-secondary">Study Guides</a>
+        </div>
+    </div>
+
+    <!-- Resource Grid -->
+    <div class="product-grid">
+        {% for resource in resources %}
+        <div class="product-card">
+            <div class="product-image">
+                {% if resource.file_path %}
+                <img src="{{ url_for('static', filename='uploads/' + resource.file_path) }}" 
+                     alt="{{ resource.title }}">
+                {% else %}
+                <div class="no-image">
+                    <i class="bi bi-image text-muted"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="product-details">
+                <h5 class="product-title">{{ resource.title }}</h5>
+                <div class="product-price">${{ "%.2f"|format(resource.price) }}</div>
+                <div class="product-meta">
+                    <span class="condition">Condition: {{ resource.condition }}</span>
+                    <span class="category">Category: {{ resource.subject }}</span>
+                </div>
+                <div class="product-seller">Seller: {{ resource.author.username }}</div>
+                <div class="product-actions">
+                    <a href="{{ url_for('view_resource', id=resource.id) }}" class="btn btn-dark btn-sm">
+                        <i class="bi bi-chat"></i> Message
+                    </a>
+                    <button type="button" class="btn btn-light btn-sm favorite-btn">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not resources %}
+    <div class="text-center my-5">
+        <p class="text-muted">No listings found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

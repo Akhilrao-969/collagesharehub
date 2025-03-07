@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-3 mb-3">College Resource Sharing Hub</h1>
+    <p class="lead mb-4">Share and discover textbooks, notes, study materials, and more with students<br>from your college.</p>
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+        <a href="{{ url_for('explore') }}" class="btn btn-primary px-4">
+            Explore Listings
+            <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+        <a href="{{ url_for('create_resource') }}" class="btn btn-dark px-4">Share a Resource</a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    <div class="col">
+        <div class="card h-100 border-0 bg-transparent">
+            <div class="card-body text-center">
+                <i class="bi bi-search display-4 mb-3"></i>
+                <h5 class="card-title">Discover Resources</h5>
+                <p class="card-text text-muted">Find textbooks, notes, study guides, and more from students at your college.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card h-100 border-0 bg-transparent">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 mb-3"></i>
+                <h5 class="card-title">Share Materials</h5>
+                <p class="card-text text-muted">Sell or exchange your used textbooks and study materials with other students.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card h-100 border-0 bg-transparent">
+            <div class="card-body text-center">
+                <i class="bi bi-people display-4 mb-3"></i>
+                <h5 class="card-title">Connect with Peers</h5>
+                <p class="card-text text-muted">Message other students directly to arrange exchanges or ask questions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">Welcome, {{ current_user.username }}!</h1>
+            <p class="lead">Manage your educational resources and share knowledge with others.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Your Resources</h5>
+                    <p class="card-text display-4">{{ resources|length }}</p>
+                    <a href="{{ url_for('create_resource') }}" class="btn btn-primary">Share New Resource</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Your Shared Resources</h2>
+            {% if resources %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for resource in resources %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ resource.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ resource.subject }}</h6>
+                            <p class="card-text">{{ resource.description[:150] }}...</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Shared on {{ resource.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('view_resource', id=resource.id) }}" class="btn btn-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <p>You haven't shared any resources yet. Start sharing your knowledge!</p>
+                <a href="{{ url_for('create_resource') }}" class="btn btn-primary">Share Your First Resource</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

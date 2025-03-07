@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Profile Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="bg-dark rounded-circle p-3">
+                    <i class="bi bi-person text-light" style="font-size: 2rem;"></i>
+                </div>
+                <div>
+                    <h4 class="mb-1">{{ current_user.username }}</h4>
+                    <p class="text-muted mb-2">Computer Science Student<br>University of Technology</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <span>Profile Completion</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar" style="width: 75%"></div>
+                        </div>
+                        <span>75%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Account Settings -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Account Settings</h5>
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-0">Notifications</p>
+                            <small class="text-muted">Receive email notifications</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notifications" checked>
+                        </div>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-0">Marketing Emails</p>
+                            <small class="text-muted">Receive marketing emails</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="marketing">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                               value="{{ current_user.phone_number or '' }}" placeholder="e.g., +1-234-567-8900">
+                        <small class="text-muted">This will be visible to potential buyers</small>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Notifications</h5>
+                    <div class="notification-item">
+                        <p class="mb-1">New message from Jamie</p>
+                        <small class="text-muted">2 hours ago</small>
+                    </div>
+                    <div class="notification-item">
+                        <p class="mb-1">Your listing was viewed 5 times</p>
+                        <small class="text-muted">Yesterday</small>
+                    </div>
+                    <div class="notification-item">
+                        <p class="mb-1">New comment on your listing</p>
+                        <small class="text-muted">3 days ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Listings -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title mb-4">My Listings</h5>
+            {% for resource in resources[:3] %}
+            <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-dark rounded">
+                <div class="d-flex align-items-center gap-3">
+                    {% if resource.file_path %}
+                    <img src="{{ url_for('static', filename='uploads/' + resource.file_path) }}" 
+                         class="rounded" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ resource.title }}">
+                    {% else %}
+                    <div class="bg-secondary rounded" style="width: 50px; height: 50px;"></div>
+                    {% endif %}
+                    <div>
+                        <h6 class="mb-1">{{ resource.title }}</h6>
+                        <p class="text-muted mb-0">${{ "%.2f"|format(resource.price) }}</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('edit_resource', id=resource.id) }}" class="btn btn-dark btn-sm">Edit</a>
+            </div>
+            {% endfor %}
+            <div class="text-center mt-3">
+                <a href="{{ url_for('my_listings') }}" class="btn btn-dark w-100">View All Listings</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('logout') }}" class="btn btn-link text-muted">
+            <i class="bi bi-box-arrow-right"></i> Sign Out
+        </a>
+    </div>
+</div>
+{% endblock %}

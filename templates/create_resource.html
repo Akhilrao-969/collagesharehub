@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Back Navigation -->
+    <div class="mb-4">
+        <a href="{{ url_for('my_listings') }}" class="text-decoration-none">
+            <i class="bi bi-arrow-left"></i> Back to Listings
+        </a>
+    </div>
+
+    <h2 class="text-center mb-4">Create New Listing</h2>
+
+    <!-- Progress Steps -->
+    <div class="d-flex justify-content-center gap-5 mb-5">
+        <div class="text-center">
+            <div class="rounded-circle bg-white text-black d-flex align-items-center justify-content-center" 
+                 style="width: 40px; height: 40px;">1</div>
+            <small class="d-block mt-2">Details</small>
+        </div>
+        <div class="text-center">
+            <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center" 
+                 style="width: 40px; height: 40px;">2</div>
+            <small class="d-block mt-2">Images</small>
+        </div>
+        <div class="text-center">
+            <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center" 
+                 style="width: 40px; height: 40px;">3</div>
+            <small class="d-block mt-2">Review</small>
+        </div>
+    </div>
+
+    <!-- Multi-step Form -->
+    <form method="POST" enctype="multipart/form-data" id="createListingForm" class="mb-5 pb-5">
+        {{ form.csrf_token }}
+
+        <!-- Step 1: Details -->
+        <div id="step1" class="step-content">
+            <div class="mb-4">
+                <label for="title" class="form-label">Title</label>
+                {{ form.title(class="form-control", placeholder="e.g., Calculus Textbook - 8th Edition") }}
+                <div class="invalid-feedback" id="titleError"></div>
+            </div>
+
+            <div class="mb-4">
+                <label for="category" class="form-label">Category</label>
+                {{ form.subject(class="form-select") }}
+                <div class="invalid-feedback" id="subjectError"></div>
+            </div>
+
+            <div class="mb-4">
+                <label for="condition" class="form-label">Condition</label>
+                {{ form.condition(class="form-select") }}
+                <div class="invalid-feedback" id="conditionError"></div>
+            </div>
+
+            <div class="mb-4">
+                <label for="description" class="form-label">Description</label>
+                {{ form.description(class="form-control", rows="4", placeholder="Describe your item in detail...") }}
+                <div class="invalid-feedback" id="descriptionError"></div>
+            </div>
+
+            <div class="mb-4">
+                <label for="price" class="form-label">Price ($)</label>
+                <div class="slider-container">
+                    <input type="range" class="form-range" id="priceRange" min="0" max="1000" step="5" value="0">
+                    {{ form.price(class="form-control", min="0", step="0.01") }}
+                </div>
+                <div class="invalid-feedback" id="priceError"></div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-primary px-4" onclick="validateAndProceed()">
+                    Next <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Images -->
+        <div id="step2" class="step-content d-none">
+            <div class="upload-container mb-4">
+                <div class="upload-area p-5 border border-dashed rounded text-center">
+                    <i class="bi bi-cloud-upload display-4"></i>
+                    <h5 class="mt-3">Upload Images</h5>
+                    <p class="text-muted">You can upload up to 5 images. First image will be the cover.</p>
+                    <input type="file" class="form-control" id="file" name="file" 
+                           accept="image/*" multiple required>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-dark px-4" onclick="prevStep(1)">
+                    <i class="bi bi-arrow-left me-2"></i> Back
+                </button>
+                <button type="button" class="btn btn-primary px-4" onclick="nextStep(3)">
+                    Next <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Review -->
+        <div id="step3" class="step-content d-none">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Review Your Listing</h5>
+                    <div class="review-details">
+                        <div class="mb-3">
+                            <strong>Title</strong>
+                            <p id="reviewTitle" class="mb-0"></p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Category</strong>
+                            <p id="reviewCategory" class="mb-0"></p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Condition</strong>
+                            <p id="reviewCondition" class="mb-0"></p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Price</strong>
+                            <p id="reviewPrice" class="mb-0"></p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Description</strong>
+                            <p id="reviewDescription" class="mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-dark px-4" onclick="prevStep(2)">
+                    <i class="bi bi-arrow-left me-2"></i> Back
+                </button>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-check2 me-2"></i> Publish
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+async function validateAndProceed() {
+    const formData = new FormData(document.getElementById('createListingForm'));
+
+    try {
+        const response = await fetch('{{ url_for("validate_form") }}', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        // Reset all error states
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+
+        if (data.valid) {
+            nextStep(2);
+        } else {
+            // Show validation errors
+            for (const [field, errors] of Object.entries(data.errors)) {
+                const input = document.getElementById(field);
+                const errorDiv = document.getElementById(field + 'Error');
+                if (input && errorDiv) {
+                    input.classList.add('is-invalid');
+                    errorDiv.textContent = errors[0];
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error validating form:', error);
+    }
+}
+
+function nextStep(step) {
+    // Hide current step
+    document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.add('d-none');
+    });
+
+    // Show next step
+    document.getElementById(`step${step}`).classList.remove('d-none');
+
+    // Update progress indicators
+    updateProgress(step);
+
+    // If moving to review step, populate review data
+    if (step === 3) {
+        populateReview();
+    }
+}
+
+function prevStep(step) {
+    // Hide current step
+    document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.add('d-none');
+    });
+
+    // Show previous step
+    document.getElementById(`step${step}`).classList.remove('d-none');
+
+    // Update progress indicators
+    updateProgress(step);
+}
+
+function updateProgress(currentStep) {
+    // Update progress indicators styling
+    document.querySelectorAll('.rounded-circle').forEach((circle, index) => {
+        if (index + 1 <= currentStep) {
+            circle.classList.remove('bg-dark');
+            circle.classList.add('bg-white');
+            circle.classList.remove('text-white');
+            circle.classList.add('text-black');
+        } else {
+            circle.classList.add('bg-dark');
+            circle.classList.remove('bg-white');
+            circle.classList.add('text-white');
+            circle.classList.remove('text-black');
+        }
+    });
+}
+
+function populateReview() {
+    document.getElementById('reviewTitle').textContent = document.getElementById('title').value;
+    document.getElementById('reviewCategory').textContent = document.getElementById('category').options[document.getElementById('category').selectedIndex].text;
+    document.getElementById('reviewCondition').textContent = document.getElementById('condition').value;
+    document.getElementById('reviewPrice').textContent = `$${document.getElementById('price').value}`;
+    document.getElementById('reviewDescription').textContent = document.getElementById('description').value;
+}
+
+// Price range slider sync
+document.getElementById('priceRange').addEventListener('input', function() {
+    document.getElementById('price').value = this.value;
+});
+
+document.getElementById('price').addEventListener('input', function() {
+    document.getElementById('priceRange').value = this.value;
+});
+</script>
+
+<style>
+.border-dashed {
+    border-style: dashed !important;
+}
+
+.upload-area {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+}
+
+.slider-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.form-range {
+    flex-grow: 1;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: #fff;
+}
+
+#price {
+    width: 120px;
+}
+</style>
+{% endblock %}

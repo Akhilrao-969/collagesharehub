@@ -1,0 +1,96 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Edit Resource</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="resourceForm">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            {{ form.title(class="form-control", id="title", placeholder="Enter a title for your resource") }}
+                            <div class="invalid-feedback" id="title-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            {{ form.description(class="form-control", id="description", rows="4", placeholder="Describe your resource in detail") }}
+                            <div class="invalid-feedback" id="description-feedback"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="subject" class="form-label">Category</label>
+                                {{ form.subject(class="form-control", id="subject") }}
+                                <div class="invalid-feedback" id="subject-feedback"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="condition" class="form-label">Condition</label>
+                                {{ form.condition(class="form-control", id="condition") }}
+                                <div class="invalid-feedback" id="condition-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price ($)</label>
+                            {{ form.price(class="form-control", id="price", placeholder="Enter price in USD") }}
+                            <div class="invalid-feedback" id="price-feedback"></div>
+                        </div>
+                        
+                        {% if resource.file_path %}
+                        <div class="mb-3">
+                            <label class="form-label">Current Image</label>
+                            <div class="mb-2">
+                                <img src="{{ url_for('static', filename='uploads/' + resource.file_path) }}" 
+                                     class="img-thumbnail" style="max-height: 200px" alt="{{ resource.title }}">
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="remove_image" value="yes" id="removeImage">
+                                <label class="form-check-label" for="removeImage">
+                                    Remove this image
+                                </label>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Upload New Image (Optional)</label>
+                            {{ form.file(class="form-control", id="file") }}
+                            <div class="form-text">Upload a new image only if you want to replace the current one.</div>
+                            <div class="invalid-feedback" id="file-feedback"></div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="{{ url_for('my_listings') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('resourceForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Reset validation states
+        const inputs = form.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+            const feedbackEl = document.getElementById(`${input.id}-feedback`);
+            if (feedbackEl) feedbackEl.textContent = '';
+        });
+        
+        // Submit the form
+        form.submit();
+    });
+});
+</script>
+{% endblock %}
