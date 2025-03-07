@@ -5,7 +5,8 @@ A web platform for college students to buy, sell, and exchange academic resource
 
 ## Live Demo
 
-The application is hosted at: https://mycollegeresources.vigneshchowdaryatthapatala.repl.co/
+The application will be accessible at our main website:
+[collagesharehub](https://bringing-heavy-plains-felt.trycloudflare.com)
 
 ## Features
 
@@ -112,6 +113,26 @@ After running the setup script, you can log in with these credentials:
 4. **Faculty Member:**
    - Username: prof_physics
    - Password: faculty456
+  
+
+## Running the Server
+
+To run the CollageShareHub server:
+
+1. **Make the server script executable**
+   ```bash
+   chmod +x run_server.sh
+   ```
+
+2. **Run the server**
+   ```bash
+   ./run_server.sh
+   ```
+
+
+
+
+
 
 ## Project Structure
 
